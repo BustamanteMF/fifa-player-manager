@@ -1,13 +1,15 @@
 const { Player } = require('../models');
+const { Op } = require('sequelize');
+const XLSX = require('xlsx');
 
 // GET api/players
 exports.getAllPlayers = async (req, res) => {
     try {
         const { name, position, club } = req.query;
         const where = {};
-        if (name) where.name = name;
-        if (position) where.position = position;
-        if (club) where.club = club;
+        if (name) where.long_name = { [Op.like]: `%${name}%` };
+        if (position) where.player_positions = { [Op.like]: `%${position}%` };
+        if (club) where.club_name = { [Op.like]: `%${club}%` };
 
         const limit = req.query.limit ? parseInt(req.query.limit, 10) : 10;
         const offset = req.query.offset ? parseInt(req.query.offset, 10) : 0;
@@ -24,9 +26,9 @@ exports.downloadPlayers = async (req, res) => {
     try {
         const { name, club, position } = req.query;
         const where = {};
-        if (name) where.name = name;
-        if (club) where.club = club;
-        if (position) where.position = position;
+        if (name) where.long_name = { [Op.like]: `%${name}%` };
+        if (club) where.club_name = { [Op.like]: `%${club}%` };
+        if (position) where.player_positions = { [Op.like]: `%${position}%` };
         const players = await Player.findAll({where});
         
         const data = players.map(p => p.toJSON());
