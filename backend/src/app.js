@@ -1,25 +1,33 @@
 const { sequelize, User, Player } = require('./models');
+const express = require('express');
+const app = express();
+const playerRoutes = require('./routes/playerRoutes');
+const authRoutes = require('./routes/authRoutes');
 
-async function main() {
+app.use(express.json());
+app.use('/api/players', playerRoutes);
+app.use('/auth', authRoutes);
+
+const PORT = process.env.PORT || 3000;
+
+async function startServer() {
   try {
     await sequelize.authenticate();
     console.log('Connection has been established successfully.');
 
-    console.log('Syncing only User model (will create/alter users table if needed)...');
+    // Solo sincroniza User en desarrollo (no tocar otras tablas)
     await User.sync({ alter: true, logging: (msg) => console.log('[SQL]', msg) });
     console.log('User table is ready.');
 
-    const user = await User.create({
-      email: 'test1@example.com',
-      password: 'password123',
-      name: 'TestUser',
+    app.listen(PORT, () => {
+      console.log(`Server listening on http://localhost:${PORT}`);
     });
-    console.log('User created successfully:', user.toJSON());
   } catch (error) {
-    console.error('User test failed:', error);
-  } finally {
-    await sequelize.close();
+    console.error('Failed to start server:', error);
+    process.exit(1);
   }
 }
 
-main();
+startServer();
+
+module.exports = app;
