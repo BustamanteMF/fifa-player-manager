@@ -1,12 +1,17 @@
 const { sequelize, User, Player } = require('./models');
 const express = require('express');
+const cors = require('cors');
 const app = express();
 const playerRoutes = require('./routes/playerRoutes');
 const authRoutes = require('./routes/authRoutes');
 
 app.use(express.json());
+
+app.use(cors({ origin: 'http://localhost:4200', credentials: true }));
+
 app.use('/api/players', playerRoutes);
-app.use('/auth', authRoutes);
+// montar las rutas de auth bajo /api/auth para coincidir con el frontend
+app.use('/api/auth', authRoutes);
 
 const PORT = process.env.PORT || 3000;
 

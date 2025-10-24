@@ -8,11 +8,11 @@ router.use(authMiddleware);
 
 // Route to get all players with optional filtering and pagination
 router.get('/', playerController.getAllPlayers);
-// Route to download players data (mover antes de /:id)
+// Route to download players data as Excel file
 router.get('/download', playerController.downloadPlayers);
 // Route to get player by id
 router.get('/:id', playerController.getPlayerById);
-// Route to update player data
+// Route to update player 
 router.put('/:id', playerController.updatePlayer);
 // Route to create a new player
 router.post('/', playerController.createPlayer);
