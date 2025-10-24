@@ -137,3 +137,29 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Frontend (Angular) - ignore build artifacts, caches, node_modules and local envs
+/frontend/node_modules/
+/frontend/dist/
+/frontend/dist-*/
+/frontend/build/
+/frontend/.angular/
+/frontend/.cache/
+/frontend/.vite/
+/frontend/.parcel-cache/
+/frontend/.npm/
+
+# Frontend editor/IDE and logs
+/frontend/.vscode/
+/frontend/.idea/
+/frontend/*.log
+
+# Local environment files for frontend
+/frontend/src/environments/*.local.ts
+/frontend/src/environments/*.env.ts
+
+# TypeScript incremental build info inside frontend
+/frontend/**/*.tsbuildinfo
+
+# OS files
+.DS_Store
