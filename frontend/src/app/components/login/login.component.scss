@@ -1,0 +1,40 @@
+/* Login card styles - pastel theme */
+
+.login-card {
+	width: 100%;
+	max-width: 420px;
+	margin: 0 auto;
+	background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.7));
+	border-radius: 14px;
+	padding: 1.25rem 1.5rem;
+	box-shadow: 0 10px 30px rgba(40,40,60,0.08);
+	backdrop-filter: blur(6px) saturate(120%);
+}
+
+.login-form { display:flex; flex-direction:column; gap:0.9rem }
+.title { margin:0 0 0.4rem 0; color:var(--primary); font-weight:600 }
+
+.field { display:flex; flex-direction:column; gap:0.35rem }
+.label { font-size:0.85rem; color:var(--muted) }
+.field input {
+	padding: 0.6rem 0.9rem;
+	border-radius: 10px;
+	border: 1px solid rgba(34,34,34,0.08);
+	background: linear-gradient(180deg, var(--accent-2), var(--accent-3));
+	outline: none;
+	font-size: 0.95rem;
+}
+.field input:focus { box-shadow: 0 6px 18px rgba(167,123,255,0.12); border-color: var(--primary) }
+
+.actions { display:flex; gap:0.6rem; margin-top:0.6rem }
+.btn { padding:0.6rem 0.95rem; border-radius:10px; border:0; cursor:pointer; font-weight:600 }
+.btn.primary { background: linear-gradient(90deg, var(--primary) 0%, #8fd1ff 100%); color:var(--primary-contrast); box-shadow: 0 8px 20px rgba(167,123,255,0.18) }
+.btn.ghost { background:transparent; border:1px solid rgba(34,34,34,0.06); color:var(--muted) }
+.btn[disabled] { opacity:0.6; cursor:not-allowed }
+
+.hint { margin:0.5rem 0 0; font-size:0.85rem; color:var(--muted); text-align:center }
+
+@media (max-width:480px) {
+	.login-card { padding:1rem }
+	.actions { flex-direction:column }
+}
