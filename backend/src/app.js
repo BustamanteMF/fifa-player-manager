@@ -7,7 +7,15 @@ const authRoutes = require('./routes/authRoutes');
 
 app.use(express.json());
 
-app.use(cors({ origin: 'http://localhost:4200', credentials: true }));
+app.disable('etag');
+
+// Allow Authorization header explicitly so browser can send Bearer token in requests
+app.use(cors({
+  origin: 'http://localhost:4200',
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['Authorization']
+}));
 
 app.use('/api/players', playerRoutes);
 // montar las rutas de auth bajo /api/auth para coincidir con el frontend

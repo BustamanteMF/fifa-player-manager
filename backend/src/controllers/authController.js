@@ -51,14 +51,39 @@ const authController = {
         return res.status(401).json({ error: 'Invalid email or password' });
       }
 
-      const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '1h' });
+  const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || '1h' });
+
+  // create a refresh token (longer expiry). In a production app you should store
+  // refresh tokens server-side (DB) or use httpOnly cookies. This example returns
+  // it in the response body for simplicity.
+  const refreshToken = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d' });
 
       const userSafe = { id: user.id, email: user.email, name: user.name };
 
-      return res.json({ token, user: userSafe });
+      return res.json({ token, refreshToken, user: userSafe });
     } catch (error) {
       console.error('Error logging in user:', error);
       return res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
+  // Exchange a refresh token for a new access token
+  refresh: async (req, res) => {
+    const { refreshToken } = req.body;
+    if (!refreshToken) return res.status(400).json({ error: 'refreshToken required' });
+
+    try {
+      const decoded = jwt.verify(refreshToken, JWT_SECRET);
+      const userId = decoded.userId;
+      // Optionally validate that this refresh token is still valid (DB or blacklist)
+      const newToken = jwt.sign({ userId }, JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || '1h' });
+      return res.json({ token: newToken });
+    } catch (err) {
+      console.error('Error refreshing token:', err);
+      if (err && err.name === 'TokenExpiredError') {
+        return res.status(401).json({ error: 'refresh_token_expired' });
+      }
+      return res.status(401).json({ error: 'Invalid refresh token' });
     }
   },
 };

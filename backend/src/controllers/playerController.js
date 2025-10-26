@@ -1,49 +1,83 @@
-const { Player } = require('../models');
 const { Op } = require('sequelize');
-const XLSX = require('xlsx');
+const { Player } = require('../models');
 
-// GET api/players
 exports.getAllPlayers = async (req, res) => {
-    try {
-        const { name, position, club } = req.query;
-        const where = {};
-        if (name) where.long_name = { [Op.like]: `%${name}%` };
-        if (position) where.player_positions = { [Op.like]: `%${position}%` };
-        if (club) where.club_name = { [Op.like]: `%${club}%` };
+  try {
+    const {
+      page = 1,
+      limit = 10,
+      long_name,
+      club_name,
+      player_positions,
+      sortBy = 'long_name',
+      sortDir = 'ASC'
+    } = req.query;
 
-        const limit = req.query.limit ? parseInt(req.query.limit, 10) : 10;
-        const offset = req.query.offset ? parseInt(req.query.offset, 10) : 0;
-        
-        const players = await Player.findAll({ where, limit, offset });
-        res.json(players);
-    } catch (error) {
-        console.error('Error fetching players:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
+    const where = {};
+    if (long_name) where.long_name = { [Op.like]: `%${long_name}%` };
+    if (club_name) where.club_name = { [Op.like]: `%${club_name}%` };
+    if (player_positions) where.player_positions = { [Op.like]: `%${player_positions}%` };
+
+    const pageInt = Math.max(1, parseInt(page, 10));
+    const limitInt = Math.max(1, parseInt(limit, 10));
+    const offset = (pageInt - 1) * limitInt;
+
+    const order = [[sortBy, sortDir.toUpperCase() === 'ASC' ? 'ASC' : 'DESC']];
+
+    // Evitar cache en datos dinámicos
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+
+    const { count, rows } = await Player.findAndCountAll({
+      where,
+      limit: limitInt,
+      offset,
+      order
+    });
+
+    return res.json({
+      rows,
+      count,
+      page: pageInt,
+      totalPages: Math.max(1, Math.ceil(count / limitInt))
+    });
+  } catch (err) {
+    console.error('getAllPlayers error', err);
+    return res.status(500).json({ error: err.message });
+  }
 };
 // GET /api/players/download
 exports.downloadPlayers = async (req, res) => {
-    try {
-        const { name, club, position } = req.query;
-        const where = {};
-        if (name) where.long_name = { [Op.like]: `%${name}%` };
-        if (club) where.club_name = { [Op.like]: `%${club}%` };
-        if (position) where.player_positions = { [Op.like]: `%${position}%` };
-        const players = await Player.findAll({where});
-        
-        const data = players.map(p => p.toJSON());
-        const worksheet = XLSX.utils.json_to_sheet(data);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, 'Players');
-        const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-        res.setHeader('Content-Disposition', 'attachment; filename=players.xlsx');
-        res.send(Buffer.from(excelBuffer));
-    } catch (error) {
-        console.error('Error downloading players:', error);
-        res.status(500).json({ error: 'Internal server error' });
+  try {
+    const { long_name, club_name, player_positions } = req.query;
+    const where = {};
+    if (long_name) where.long_name = { [Op.like]: `%${long_name}%` };
+    if (club_name) where.club_name = { [Op.like]: `%${club_name}%` };
+    if (player_positions) where.player_positions = { [Op.like]: `%${player_positions}%` };
+
+    const players = await Player.findAll({ where, raw: true });
+
+    if (!players || players.length === 0) {
+      return res.status(204).send(); // no content
     }
+    const columns = Object.keys(players[0]);
+    const csvRows = [
+      columns.join(','), // encabezado
+      ...players.map(p => columns.map(c => {
+        const v = p[c] === null || p[c] === undefined ? '' : String(p[c]);
+        return `"${v.replace(/"/g, '""')}"`;
+      }).join(','))
+    ];
+    const csv = csvRows.join('\r\n');
+
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename="players.csv"');
+    res.send(csv);
+  } catch (err) {
+    console.error('downloadPlayers error', err);
+    res.status(500).json({ error: err.message });
+  }
 };
-// GET api/players/:id
+
 exports.getPlayerById = async (req, res) => {
     try {
         const player = await Player.findByPk(req.params.id);
