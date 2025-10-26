@@ -1,1 +1,31 @@
-<p>player-list works!</p>
+<form [formGroup]="filterForm" (ngSubmit)="onSubmit()">
+    <input formControlName="long_name"placeholder="Nombre">
+    <input formControlName="club_name" placeholder="Club">
+    <input formControlName="player_positions" placeholder="Posición">
+    <button type="submit">Filtrar</button>
+</form>
+<table>
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Club</th>
+            <th>Posición</th>
+            <th>Rating</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let player of players">
+            <td>{{ player.long_name }}</td>
+            <td>{{ player.club_name }}</td>
+            <td>{{ player.player_positions }}</td>
+            <td>{{ player.overall }}</td>
+        </tr>
+    </tbody>
+</table>
+<div>
+    <button (click)="changePage(currentPage -1)" [disabled]="currentPage === 1">Anterior</button>
+    <span>Página {{ currentPage }} de {{ totalPages }}</span>
+    <button (click)="changePage(currentPage +1)" [disabled]="currentPage === totalPages">Siguiente</button>
+    <button (click)="downloadCsv()" type="submit">Descargar CSV</button>
+</div>
+

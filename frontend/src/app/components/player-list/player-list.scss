@@ -1,0 +1,119 @@
+:host {
+  display: block;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+form[formGroup] {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+form[formGroup] input {
+  padding: 0.6rem 0.9rem;
+  border-radius: 10px;
+  border: 1px solid rgba(34,34,34,0.08);
+  background: linear-gradient(180deg, var(--accent-2, #fff), var(--accent-3, #fff));
+  outline: none;
+  font-size: 0.95rem;
+  min-width: 160px;
+}
+
+form[formGroup] input:focus {
+  box-shadow: 0 6px 18px rgba(167,123,255,0.12);
+  border-color: var(--primary);
+}
+
+button {
+  padding: 0.6rem 0.95rem;
+  border-radius: 10px;
+  border: 0;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+button[type="submit"] {
+  background: linear-gradient(90deg, var(--primary) 0%, #8fd1ff 100%);
+  color: var(--primary-contrast, #fff);
+  box-shadow: 0 8px 20px rgba(167,123,255,0.18);
+}
+
+button[type="button"] {
+  background: transparent;
+  border: 1px solid rgba(34,34,34,0.06);
+  color: var(--muted);
+}
+
+button[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+  background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.95));
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+thead {
+  background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9));
+}
+
+th, td {
+  padding: 0.65rem 0.8rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(34,34,34,0.04);
+  font-size: 0.95rem;
+  color: #222;
+}
+
+th {
+  font-weight: 600;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+tbody tr:hover {
+  background: rgba(0,0,0,0.02);
+}
+
+.status, .empty {
+  margin: 0.75rem 0;
+  color: var(--muted);
+}
+
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.pagination .controls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+@media (max-width: 600px) {
+  form[formGroup] {
+    flex-direction: column;
+    align-items: center;
+  }
+  form[formGroup] input { width: 100%; }
+
+  // Para ocultar columnas secundarios si hacen la tabla muy ancha
+  th:nth-child(6), td:nth-child(6),
+  th:nth-child(7), td:nth-child(7) {
+    display: none;
+  }
+}
+
+.text-muted { color: var(--muted); }
